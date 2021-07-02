@@ -1,5 +1,6 @@
 use tide::{prelude::Serialize, Body, Response, ResponseBuilder};
 
+#[derive(Debug, PartialEq)]
 pub enum Message<T, E> {
     /// 200 Status
     Ok(T),
