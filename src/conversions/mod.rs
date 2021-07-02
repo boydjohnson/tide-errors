@@ -4,7 +4,7 @@ use crate::message::Message;
 pub mod database;
 
 pub trait ConversionHandler<T, E1, E2> {
-    fn possibly_convert(&self, res: &Result<T, E2>) -> Option<Result<Message<T, E1>, E2>>;
+    fn possibly_convert(&mut self, res: &Result<T, E2>) -> Option<Result<Message<T, E1>, E2>>;
 }
 
 pub struct Converter<T, E1, E2> {
@@ -25,11 +25,11 @@ impl<T, E1, E2> Converter<T, E1, E2> {
     }
 
     pub fn execute<F: Fn(T) -> Message<T, E1>>(
-        &self,
+        &mut self,
         res: Result<T, E2>,
         f: F,
     ) -> Result<Message<T, E1>, E2> {
-        for converter in &self.conversions {
+        for converter in &mut self.conversions {
             if let Some(msg) = converter.possibly_convert(&res) {
                 return msg;
             }
