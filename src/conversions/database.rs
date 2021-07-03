@@ -31,15 +31,42 @@ impl<T, E> DatabaseCode<T, E> for ForeignKeyConstraint {
 }
 
 pub struct DatabaseConstraintConversion<O, D> {
-    field: String,
     index: Option<String>,
     options: Option<O>,
     _phantom: std::marker::PhantomData<D>,
 }
 
+impl<O, D> Default for DatabaseConstraintConversion<O, D> {
+    fn default() -> Self {
+        Self {
+            index: None,
+            options: None,
+            _phantom: std::marker::PhantomData::default(),
+        }
+    }
+}
+
+impl<O, D> DatabaseConstraintConversion<O, D> {
+    pub fn with_options(options: O) -> Self {
+        Self {
+            index: None,
+            options: Some(options),
+            _phantom: std::marker::PhantomData::default(),
+        }
+    }
+
+    pub fn with_index_and_options(index: String, options: O) -> Self {
+        Self {
+            index: Some(index),
+            options: Some(options),
+            _phantom: std::marker::PhantomData::default(),
+        }
+    }
+}
+
 impl<T, E, O, D> ConversionHandler<T, E, sqlx::Error> for DatabaseConstraintConversion<O, D>
 where
-    (String, Option<O>): Into<E>,
+    Option<O>: Into<E>,
     D: DatabaseCode<T, E>,
 {
     fn possibly_convert(
@@ -52,9 +79,7 @@ where
                 && self.index.as_deref() == e.constraint()
                 || e.code() == Some(Cow::from(D::CODE)) && self.index.is_none()
             {
-                return Some(Ok(D::to_message(
-                    (self.field.clone(), self.options.take()).into(),
-                )));
+                return Some(Ok(D::to_message(self.options.take().into())));
             }
         }
 
