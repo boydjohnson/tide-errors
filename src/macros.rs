@@ -2,8 +2,7 @@
 macro_rules! convert {
     ($res:ident, ok => $f:expr, $($conversion:expr),+) => {
         {
-            use crate::conversions::Converter;
-            let mut converter = Converter::default();
+            let mut converter = $crate::conversions::Converter::default();
 
             $(
                 converter.add_conversion($conversion);
