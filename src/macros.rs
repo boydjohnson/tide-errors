@@ -62,4 +62,24 @@ mod tests {
             }))
         );
     }
+
+    #[test]
+    fn test_not_error() {
+        let res = Ok(2);
+
+        assert_eq!(
+            convert!(res, ok => Message::created, UserErrorHandler::default()),
+            Ok(Message::created(2))
+        );
+    }
+
+    #[test]
+    fn test_server_error() {
+        let res: Result<usize, _> = Err(Error2::ServerError);
+
+        assert_eq!(
+            convert!(res, ok => Message::created, UserErrorHandler::default()),
+            Err(Error2::ServerError)
+        );
+    }
 }
