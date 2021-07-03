@@ -11,7 +11,7 @@ Use the default JSON errors.
 
 
 ```rust
-    convert!(db::create_some_object(...).await, DatabaseConstraintConversion::<(), UniqueConstraint>::from_field("todos"), DatabaseConstraintConversion::<(), ForeignKeyConstraint>::from_field("todos"), ok => Message::created, ())
+    convert!(db::create_some_object(...).await, ok => Message::created, DatabaseConstraintConversion::<(), UniqueConstraint>::default(), DatabaseConstraintConversion::<(), ForeignKeyConstraint>::default())
 ```
 
 Use your own JSON error
@@ -19,5 +19,5 @@ Use your own JSON error
 ```rust
     let options = MyOptions::new(...);
 
-    convert!(db::create_some_object(...).await, DatabaseConstraintConversion::<MyOptions, UniqueConstraint>::from_field("todos"), DatabaseConstraintConversion::<(), ForeignKeyConstraint>::from_field("todos"), ok => Message::created, options)
+    convert!(db::create_some_object(...).await, ok => Message::created, DatabaseConstraintConversion::<_, UniqueConstraint>::with_options(options.clone()), DatabaseConstraintConversion::<_, ForeignKeyConstraint>::with_options(options))
 ```
